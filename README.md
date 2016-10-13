@@ -28,7 +28,7 @@ $ npm install sails-hook-lint
 ```js
 module.exports.lint = {
   enabled: true, // Enable lint. Defaults to `true`
-  formatter: 'stylish', // Formatter. Defaults to `stylish`
+  format: 'stylish', // Formatter. Defaults to `stylish`
   // Folders or files to lint or be ignored, support glob patterns,
   // pattern that starts with '!' are ignored by linting.  
   src: [
