@@ -41,6 +41,13 @@ describe('Enable tests ::', function() {
     return true;
   });
 
+  it('check status is a readonly number', function() {
+    sails.hooks.lint.should.have.property('status').which.is.a.Number();
+    (function() {
+      sails.hooks.lint.status = 1;
+    }).should.throw();
+  });
+
   it('find global of sails', function() {
     let lib = rewire('../index.js');
     let getGlobalsOfSails = lib.__get__('getGlobalsOfSails');

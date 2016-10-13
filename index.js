@@ -6,6 +6,15 @@
  * @date 2016-10-11
  */
 
+// Check status unknown, init status
+const STATUS_UNKNOWN = -1;
+// Check success
+const STATUS_SUCCESS = 0;
+// Check error
+const STATUS_ERROR = 1;
+// Check warning
+const STATUS_WARN = 2;
+
 const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
@@ -52,6 +61,10 @@ function getAppESLintConfig(appPath) {
   return null;
 }
 
+function defaultIfNull(val, defVal) {
+  return val || defVal;
+}
+
 /**
  * Get globals from sails's models and services
  * @param sails Sails
@@ -64,7 +77,36 @@ function getGlobalsOfSails(sails) {
   );
 }
 
+/**
+ * Run eslint and return status
+ * @param {Array} patterns
+ * @param {String} format
+ * @param {Function} reportError
+ * @param {Function} reportWarn
+ * @param {Object} options
+ * @returns {number} status
+ */
+function runLint(patterns, format, reportError, reportWarn, options) {
+  options = defaultIfNull(options, {});
+  let cli = new CLIEngine(options);
+  let report = cli.executeOnFiles(defaultIfNull(patterns, ['.']));
+  let formatter = cli.getFormatter(defaultIfNull(format, 'stylish'));
+  if (report) {
+    if (report.errorCount > 0) {
+      reportError = defaultIfNull(reportError, console.error);
+      reportError(formatter(report.results));
+      return STATUS_ERROR;
+    } else if (report.warningCount > 0) {
+      reportWarn = defaultIfNull(reportWarn, console.warn);
+      reportWarn(formatter(report.results));
+      return STATUS_WARN;
+    }
+  }
+  return STATUS_SUCCESS;
+}
+
 module.exports = function(sails) {
+  let _status = STATUS_UNKNOWN;
   return {
     /**
      * Default configuration
@@ -89,6 +131,28 @@ module.exports = function(sails) {
         reportWarn: console.warn
       }
     },
+    configure: function() {
+      Object.defineProperty(this, 'STATUS_UNKNOWN', {
+        value: STATUS_UNKNOWN,
+        writable: false,
+        configurable: false
+      });
+      Object.defineProperty(this, 'STATUS_ERROR', {
+        value: STATUS_ERROR,
+        writable: false,
+        configurable: false
+      });
+      Object.defineProperty(this, 'STATUS_WARN', {
+        value: STATUS_WARN,
+        writable: false,
+        configurable: false
+      });
+      Object.defineProperty(this, 'status', {
+        get: function() {
+          return _status;
+        }
+      });
+    },
     initialize: function initialize(cb) {
       if (!sails.config[this.configKey].enabled) {
         sails.log.verbose('ESLint hook disabled.');
@@ -103,24 +167,12 @@ module.exports = function(sails) {
         // Extract the path to be ignored
         let ignorePattern = src.filter(p => p.trim().startsWith('!')).map(p => p.trim().substr(1));
         let patterns = src.filter(p => !p.trim().startsWith('!'));
-        let cli = new CLIEngine({
+        sails.log.info('ESLint start...');
+        _status = runLint(patterns, config.format, config.reportError, config.reportWarn, {
           globals: globals,
           ignorePattern: ignorePattern,
           configFile: configFile
         });
-        sails.log.info('ESLint start...');
-        let report = cli.executeOnFiles(patterns || /* istanbul ignore next */ ['.']);
-        let formatter = cli.getFormatter(config.format || /* istanbul ignore next */ 'stylish');
-        /* istanbul ignore next */
-        if (report) {
-          if (report.errorCount > 0) {
-            let reportError = config.errorReport || /* istanbul ignore next */ console.error;
-            reportError(formatter(report.results));
-          } else if (report.warningCount > 0) {
-            let reportWarn = config.errorWarn || /* istanbul ignore next */ console.warn;
-            reportWarn(formatter(report.results));
-          }
-        }
         sails.log.info('ESLint finished.');
         return cb();
       }

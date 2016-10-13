@@ -1,6 +1,6 @@
 {
   "name": "sails-hook-lint",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Sails hook for code style check",
   "main": "index.js",
   "scripts": {
@@ -37,6 +37,7 @@
     "mocha": "^3.1.2",
     "rewire": "^2.5.2",
     "sails": "^0.12.7",
-    "should": "^11.1.1"
+    "should": "^11.1.1",
+    "sinon": "^1.17.6"
   }
 }
