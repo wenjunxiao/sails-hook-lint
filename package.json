@@ -1,0 +1,43 @@
+{
+  "name": "sails-hook-lint",
+  "version": "1.1.1",
+  "description": "Sails hook for code style check",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/",
+    "check": "./node_modules/.bin/eslint .",
+    "test-travis": "node --harmony node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- --reporter dot"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wenjunxiao/sails-hook-lint.git"
+  },
+  "keywords": [
+    "sails",
+    "sails-hook",
+    "eslint"
+  ],
+  "author": "Wenjun.Xiao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wenjunxiao/sails-hook-lint/issues"
+  },
+  "homepage": "https://github.com/wenjunxiao/sails-hook-lint#readme",
+  "sails": {
+    "isHook": true
+  },
+  "dependencies": {
+    "eslint": "^3.7.1",
+    "glob": "^7.1.1",
+    "lodash": "^4.16.4"
+  },
+  "devDependencies": {
+    "coveralls": "^2.11.14",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.1.2",
+    "rewire": "^2.5.2",
+    "sails": "^0.12.7",
+    "should": "^11.1.1",
+    "sinon": "^1.17.6"
+  }
+}
