@@ -127,6 +127,7 @@ module.exports = function(sails) {
           '!app.js',
           '!api/responses/**/*.js'
         ],
+        parserOptions: {},
         reportError: console.error,
         reportWarn: console.warn
       }
@@ -171,7 +172,8 @@ module.exports = function(sails) {
         _status = runLint(patterns, config.format, config.reportError, config.reportWarn, {
           globals: globals,
           ignorePattern: ignorePattern,
-          configFile: configFile
+          configFile: configFile,
+          parserOptions: config.parserOptions
         });
         sails.log.info('ESLint finished.');
         return cb();

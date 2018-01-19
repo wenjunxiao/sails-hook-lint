@@ -3,7 +3,7 @@ env:
   node: true
   mocha: true
 rules:
-  # strict: [error, global] 
+  # strict: [error, global]
   indent: [error, 2, {SwitchCase: 1}]
   linebreak-style: [error, unix]
   comma-dangle: [error, only-multiline]
